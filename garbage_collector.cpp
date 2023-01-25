@@ -18,6 +18,7 @@ typedef enum            /* enum we need to identify the types of the object we a
 typedef struct sObject
 {
     oType type;         /* struct sObject has this type field which identifies exactly what type of value it is INT OR TWIN */ 
+    unsigned char marked;
 
     union               /* union is needed in order to store data for a specific INT or TWIN */
     {
@@ -26,7 +27,7 @@ typedef struct sObject
         struct
         {
             struct sObject* head;
-            struct sObject* title;
+            struct sObject* tail;
 
         };
     };
@@ -75,3 +76,44 @@ Object* newObject(vm* vm, oType type)
 }
 
 /* now we can custom push any types of objects to this virtual machine */
+
+void pushInt(vm* vm, int intV)
+{
+    Object* object = newObject(vm, INT);
+    object -> value = intV;
+    push(vm, object);
+}
+
+Object* pushTwin(vm* vm)
+{
+    Object* object = newObject(vm, TWIN);
+    object -> tail = pop(vm);
+    object -> head = pop(vm);
+
+    push(vm, object);
+    return object;
+}
+
+/*its time to mark objects*/
+void markAll(vm* vm)
+{
+    for (int i = 0; i < vm->stackSize; i++)
+    {
+        mark(vm->stack[i]);
+    }
+}
+
+/*
+in this function, the root of our GC will be concluded
+*/
+void mark(Object* object)
+{
+    if (object->marked) return;
+    object -> marked = 1;
+
+    if (object->type == TWIN)
+    {
+        mark(object->head);
+        mark(object->tail);
+    }
+}
