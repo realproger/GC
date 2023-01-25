@@ -50,3 +50,28 @@ Object* pop(vm* vm)                     /* default pop operation to remove frame
 
 
 /* Initializing virtual machine */
+
+/*
+Function that returns an initialized stack 
+    which is the Kernel of the virtual machine itself.
+*/
+vm* newVm()
+{
+    vm* mainVm = (vm*)malloc(sizeof(vm));
+    mainVm -> stackSize = 0;
+    return mainVm;
+}
+
+/*
+Function to create objects,
+that is, the very place where the memory allocation will take place 
+    + the mark of the type bit(INT OR TWIN)
+*/
+Object* newObject(vm* vm, oType type)
+{
+    Object* object = (Object*)malloc(sizeof(Object));
+    object -> type = type;
+    return object;
+}
+
+/* now we can custom push any types of objects to this virtual machine */
